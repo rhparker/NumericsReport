@@ -223,7 +223,7 @@ The following plot shows the difference between the solutions obtained from the 
 	\caption{Difference between Chebyshev solution and Fourier solution for double pulses 2(2), 2(3), 2(4), and 2(5). Left is $N = 256$, domain size $L = 25$. Right is $N = 400$, domain size $L = 40$. Wave speed $c = 10$ for both cases.}
 \end{figure}
 
-\subsection{Eigenvalues and Eigenfunctions}
+\subsection{Eigenvalues}
 
 Next, we look at the two eigenvalue problems $Hv = \lambda v$ and $Lv = \lambda v$ corresponding to the linearization \eqref{linear4th} for the 4th order stationary equation \eqref{intKdV} and the linearization \eqref{linear5th} for the 5th order PDE \eqref{KdV5travel}, respectively. Since all our differential operators in Matlab are matrices, we can use the Matlab function \texttt{eig} to find these eigenvalues and eigenfunctions numerically. \\
 
@@ -294,9 +294,9 @@ Now that we have found the eigenvalues for double pulse 2(3) in the weighted spa
 	\caption{On left, zoom around origin of spectrum of the linearization \eqref{linear5th} of the 5th order equation \eqref{KdV5travel} about double pulse 2(3) in exponentially weighted space with weight $a = 0.1$. Pair of nonzero, complex conjugate eigenvalues marked in red. On right, zoom around origin with same scaling on imaginary axis of spectrum of the linearization \eqref{linear5th} of the 5th order equation \eqref{KdV5travel} about double pulse 2(3) in unweighted space. The same eigenvalues we found in the weighted space are marked in red. Note that in both plots you can see points in the essential spectrum. For this discretization and boundary conditions, the eigenvalues have smaller absolute value than everything in the essential spectrum. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
 \end{figure}
 
-Using Matlab's \texttt{eig} in the unweighted space, we can compute the nonzero eigenvalues of the linearization about the first four double pulses for speeds $c = 10, 7.5, 5$. The results of these computations are shown in the table below.
+Using Matlab's \texttt{eig} in the unweighted space, we can compute the nonzero eigenvalues of \eqref{linear5th}, the linearization of 5th order PDE \eqref{KdV5travel}, about the first four double pulses for speeds $c = 10, 7.5, 5$. The results of these computations are shown in the table below.
 
-\begin{table}[H]
+\begin{table}[H] 
 \begin{tabular}{l|lll}
  Double Pulse   & $c = 10$            & $c=7.5$                         & $c=5$        \\ \hline
   2(2) &     $\pm 0.4352$             & $\pm 0.2730$                    & $\pm 0.1363$ \\ 
@@ -304,17 +304,107 @@ Using Matlab's \texttt{eig} in the unweighted space, we can compute the nonzero 
   2(4) &     $\pm 0.0109$             & $\pm 0.0062$                    & \\ 
   2(5) &    -8.5834e-13 $\pm 0.0020i$ & 6.8791e-12 $\pm$ 8.8812e-04$i$  & \\
 \end{tabular}
-\caption{Nonzero eigenvalues of \eqref{linear5th}, the linearization of 5th order PDE \eqref{KdV5travel} about double pulses 2(2), 2(3), 2(4), and 2(5) for wave speeds $c = 10, 7.5, 5$. Fourier spectral methods, $N = 256$}
+\caption{Nonzero eigenvalues of \eqref{linear5th}, the linearization of 5th order PDE \eqref{KdV5travel} about double pulses 2(2), 2(3), 2(4), and 2(5) for wave speeds $c = 10, 7.5, 5$. Fourier spectral methods, $N = 256$.}
+\label{dpeigs}
 \end{table}
 
-For double pulses 2(3) and 2(5), there is a pair of complex conjugate eigenvalues which are very near to the imaginary axis. We would like to know if the real part is numerical error, i.e. if the real part is actually 0. Three pieces of numerical evidence suggest that this is actually the case. First, the sign of the small real part is not consistent, i.e. there seems to be no pattern as to whether it is positive or negative. Second, it is not hard to show that if $a + bi$ is an eigenvalue, then so is $-a + bi$. Thus if the real part is nonzero, we should expect a quartet of nonzero eigenvalues rather than a pair like we observe. Finally, we can use Matlab's \texttt{fsolve} command to eliminate the small real part and obtain a ``better'' eigenfunction, i.e. one for which $\max{|Jv - \lambda v|}$ is smaller, where $J$ is the linearization about the double pulse. To do this, we note that since $J$ is real, if we have a purely imaginary eigenvalue $\lambda = \gamma i$ with corresponding eigenfunction $v(x) = w_1(x) + i w_2(x)$, then we can write the eigenvalue problem as the pair of real-valued equations
+The next table shows the same nonzero eigenvalues for higher values of $c$.
+
+\begin{table}[H]
+\begin{tabular}{l|lll}
+ Double Pulse   & $c = 15$            & $c=20$                          & $c=25$        \\ \hline
+  2(2) &     $\pm 0.8157$             & $\pm 1.2535$                    & $\pm 1.7360$ \\ 
+  2(3) &     9.1018e-12 $\pm 0.1367i$ & 3.1324e-11 $\pm 0.2168i$        & 8.9675e-12 $\pm 0.3067i$\\ 
+\end{tabular}
+\caption{Nonzero eigenvalues of \eqref{linear5th}, the linearization of 5th order PDE \eqref{KdV5travel} about double pulses 2(2) and 2(3) for wave speeds $c = 15, 20, 25$. Fourier spectral methods, $N = 256$.}
+\end{table}
+
+Using this data, we can find a relationship between the absolute value of the eigenvalue and the wave speed. If we plot the $\log{|\lambda|}$ vs $\log{c}$, we get a reasonable straight line, thus we can predict the magnitude of the eigenvalues for a given wave speed $c$.
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{eigvsspeed}
+	\caption{Plot of $\log{|\lambda|}$ vs $\log{c}$, where $\lambda$ is the nonzero eigenvalues of \eqref{linear5th}, the linearization of 5th order PDE \eqref{KdV5travel} about double pulses 2(2) or 2(3). Fourier spectral methods, $N = 256$.}
+\end{figure}
+
+For double pulse 2(3), it is useful to look at the essential spectrum as the domain length $L$ increases (recall that the domain is $[-L, L]$. We require more Fourier nodes $N = 768$) to do this to ensure that enough grid points capture the wave in the center. The next plot shows the imaginary part of the spectrum for domain lengths from 25 to 165. The two nonzero eigenvalues on (or near) the imaginary axis are shown in red; these remain stationary as the domain length increases. As $L$ increases, the other points on the essential spectrum move down the imaginary axis towards the origin. However (at least for the values of $L$ we looked at here), these essential spectrum points always remain further from the origin than the two nonzero eigenvalues. They never ``cross over'' the eigenvalues.
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{essspecL}
+	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) plotted for domain lengths $L$ from 25 to 165. Imaginary part of nonzero eigenvalues are shown in red. Essential spectrum is shown in blue. The predicted value of the points on the essential spectrum closest to the origin (given by $\pm pi c/L$ is shown in green. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
+\end{figure}
+
+Since we have the data, we can also look at the nonzero eigenvalues as a function of domain length.
+
+\begin{table}[H]
+\begin{tabular}{l|l}
+Domain Length (L)  & Nonzero eigenvalues \\ \hline
+    25 &  $  2.3036e-09 \pm 0.0691i$   \\
+    35 &  $  5.6015e-11 \pm 0.0691i$   \\
+    45 &  $  1.4699e-10 \pm 0.0691i$   \\
+    55 &  $ -2.6976e-11 \pm 0.0691i$   \\
+    65 &  $  1.1296e-11 \pm 0.0691i$   \\
+    75 &  $  5.1110e-12 \pm 0.0691i$   \\
+    85 &  $ -4.4132e-12 \pm 0.0691i$   \\
+    95 &  $  2.6624e-12 \pm 0.0691i$   \\
+   105 &  $  2.3847e-12 \pm 0.0691i$   \\
+   115 &  $ -1.1708e-12 \pm 0.0691i$   \\
+   125 &  $  3.0109e-13 \pm 0.0691i$   \\
+   135 &  $ -3.4430e-13 \pm 0.0691i$   \\
+   145 &  $  1.0531e-12 \pm 0.0691i$   \\
+   155 &  $  5.5331e-14 \pm 0.0691i$   \\
+   165 &  $  4.2756e-13 \pm 0.0691i$   \\
+\end{tabular}
+\caption{Nonzero eigenvalues of linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) for domain lengths from 25 to 165. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
+\label{eigvsL}
+\end{table}
+
+Plotting the log of the real part of the nonzero eigenvalue versus domain length, we have a reasonable linear fit, which suggests that the real part of the nonzero eigenvalue decays exponentially as the domain length $L$ increases.
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{expdecayL}
+	\caption{Plot of the log of the real part of the nonzero eigenvalues of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(2) versus domain length $L$. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
+\end{figure}
+
+For double pulses 2(3) and 2(5), there is a pair of complex conjugate eigenvalues which are very near to the imaginary axis. We would like to know if the real part is numerical error, i.e. if the real part is actually 0. Several pieces of numerical evidence suggest that this is actually the case. 
+
+\begin{enumerate}
+
+\item The sign of the small real part is not consistent, i.e. there seems to be no pattern as to whether it is positive or negative. We can see this by looking at Table \ref{dpeigs} and Table \ref{eigvsL}. 
+
+\item Since our stationary solutions $u^*(x)$ are symmetric (i.e. even functions), we can show that if $a + bi$ is an eigenvalue of the operator $L$, the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel}, then so is $-a + bi$. To see this, consider the eigenvalue problem
+\begin{equation}\label{5theigenproblem}
+Lv(x) = \lambda v(x)
+\end{equation}
+and suppose we have found an eigenvalue $\lambda \in \C$ and an eigenfunction $v(x) \in L^2$ that solves this. Since the operator $L$ is real, we can take complex conjugates of both sides of \eqref{5theigenproblem} to get $L\bar{v}(x) = \bar{\lambda} \bar{v}(x)$. Since $\bar{v}(x)$ and $v(x)$ have the same $L^2$ norm, $\bar{v}(x)$ is in $L^2$ as well, so $\bar{v}(x)$ is an eigenfunction of $L$ with corresponding eigenvalue $\bar{\lambda}$.\\
+
+Now we will show that $v(-x)$ is an eigenfunction with eigenvalue $-\lambda$. This requires that our stationary pulse solutions are even functions. Note that the derivative of an even function is an odd function, so we have $u^*(-x) = u^*(x)$ and $u_x^*(-x) = -u_x^*(x)$. Using the expression for $L$ given in \eqref{linear5th} we write the eigenvalue problem \eqref{5theigenproblem} as
+\begin{equation*}
+v_{xxxxx}(x) - v_{xxx}(x) + [c - 2 u^*(x)]v_x(x) - 2 u^*_x(x)v(x) = \lambda v(x)
+\end{equation*}
+Since this is true for all $x \in \R$, letting $y = -x$ and noting that $\partial / \partial y = -\partial / \partial x$, this becomes
+\begin{equation*}
+-v_{yyyyy}(-y) + v_{yyy}(-y) - [c - 2 u^*(-y)]v_y(-y) - 2 u^*_x(-y)v(-y) = \lambda v(-y)
+\end{equation*}
+Note that the function $u^*_x$ is fixed (it depends only on the stationary solution we are linearizing about), thus we do not change its derivative to a derivative in $y$. Since $u^*(-x) = u^*(x)$ and $u_x^*(-x) = -u_x^*(x)$, this becomes
+\begin{equation*}
+-v_{yyyyy}(-y) + v_{yyy}(-y) - [c - 2 u^*(y)]v_y(-y) + 2 u^*_x(y)v(-y) = \lambda v(-y)
+\end{equation*}
+Changing $y$ back to $x$ and multiplying both sides by $-1$, we get
+\begin{equation*}
+v_{xxxxx}(-x) - v_{xxx}(-x) + [c - 2 u^*(x)]v_x(-x) - 2 u^*_x(x)v(-x) = -\lambda v(-x)
+\end{equation*}
+In other words, $Lv(-x) = (-\lambda)v(-x)$. Since $v(-x)$ and $v(x)$ have the same $L^2$ norm, $v(-x)$ is an eigenfunction of the operator $L$ with eigenvalue $-\lambda$. \\
+
+Combining this with the complex conjugate result, we have shown that if $a + bi$ is an eigenvalue of the operator $L$, so is $-a + bi$ (as well as $a - bi$ and $-a - bi$). Thus if we have a complex eigenvalue $a + bi$ with nonzero real and imaginary parts, we should expect a quartet of nonzero eigenvalues $\pm a \pm b i$. In our numerics, we only observe a pair of complex conjugate eigenvalues. Since we do not see a quartet, this suggests that our eigenvalues must in fact lie on the imaginary axis.
+
+\item We can use Matlab's \texttt{fsolve} command to eliminate the small real part and obtain a ``better'' eigenfunction, i.e. one for which $\max{|Lv - \lambda v|}$ is smaller, where $J$ is the linearization about the double pulse. To do this, we note that since $J$ is real, if we have a purely imaginary eigenvalue $\lambda = \gamma i$ with corresponding eigenfunction $v(x) = w_1(x) + i w_2(x)$, then we can write the eigenvalue problem as the pair of real-valued equations
 
 \begin{align}\label{realeigproblem}
-Jw_1 &= -\gamma w_2 \\
-Jw_2 &= \gamma w_1
+Lw_1 &= -\gamma w_2 \\
+Lw_2 &= \gamma w_1
 \end{align}
 
-The output of \texttt{eig} is the eigenvalues $\lambda$ and eigenfunction $v(x) = w_1(x) + i w_2(x)$. Using $w_1(x)$, $w_2(x)$, and $\gamma = \textrm{Re} \lambda$ as our initial guess, we use \texttt{fsolve} on $[w_1(x); w_2(x); \gamma]$ to construct a new eigenfunction / eigenvalue pair (the eigenvalue changes by only a tiny amount). This new pair is ``better'' in the sense that $\max{|Jv - \lambda v|}$ is smaller. Details are given in the table below.
+The output of \texttt{eig} is the eigenvalues $\lambda$ and eigenfunction $v(x) = w_1(x) + i w_2(x)$. Using $w_1(x)$, $w_2(x)$, and $\gamma = \textrm{Re} \lambda$ as our initial guess, we use \texttt{fsolve} on $[w_1(x); w_2(x); \gamma]$ to construct a new eigenfunction / eigenvalue pair (the eigenvalue changes by only a tiny amount). This new pair is ``better'' in the sense that $\max{|Lv - \lambda v|}$ is smaller. Details are given in the table below.
 
 \begin{table}[H]
 \begin{tabular}{l|ll}
@@ -325,6 +415,9 @@ The output of \texttt{eig} is the eigenvalues $\lambda$ and eigenfunction $v(x) 
 \caption{Maximum of eigenvalue problem $|Lv - \lambda v|$ before and after using Matlab's \texttt{fsolve} to eliminate small real part of eigenvalue. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
 \end{table}
 
+\end{enumerate}
+
+\section{Eigenfunctions}
 
 Now we take a look at the eigenfunctions. For the eigenfunctions with real eigenvalue, i.e. for double pulses 2(2) and 2(4), we have the following eigenfunctions.
 
@@ -389,45 +482,6 @@ where $\alpha$ and $\beta$ are the real and imaginary parts of the roots of the 
 	\includegraphics[width=8.5cm]{decayeigenvalue}
 	\caption{Exponential decay of absolute value of eigenvalues of linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse solutions. Plot also shows the predicted values of the absolute value of the eigenvalues, using formula $|\lambda| = C \sqrt{\beta}\exp{(-\alpha n \pi / 2 \beta)}$, where $C$ is a constant chosen as described above. Waves are 2(2), 2(3), 2(4), and 2(5); these correspond to $n = 0, 1, 2, 3$ in the formula. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
 \end{figure}
-
-Finally, we can look at the essential spectrum as the domain length $L$ increases. We require more Fourier nodes $N = 768$) to do this to ensure that enough grid points capture the wave in the center. The next plot shows the imaginary part of the spectrum for domain lengths from 25 to 165. The two nonzero eigenvalues on (or near) the imaginary axis are shown in red; these remain stationary as the domain length increases. As $L$ increases, the other points on the essential spectrum move down the imaginary axis towards the origin. However (at least for the values of $L$ we looked at here), these essential spectrum points always remain further from the origin than the two nonzero eigenvalues. They never ``cross over'' the eigenvalues.
-
-\begin{figure}[H]
-	\includegraphics[width=8.5cm]{essspecL}
-	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(2) plotted for domain lengths $L$ from 25 to 165. Imaginary part of nonzero eigenvalues are shown in red. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
-\end{figure}
-
-We can also look at the nonzero eigenvalues as a function of domain length.
-
-\begin{table}[H]
-\begin{tabular}{l|l}
-Domain Length (L)  & Nonzero eigenvalues \\ \hline
-    25 &  $  2.3036e-09 \pm 0.0691i$   \\
-    35 &  $  5.6015e-11 \pm 0.0691i$   \\
-    45 &  $  1.4699e-10 \pm 0.0691i$   \\
-    55 &  $ -2.6976e-11 \pm 0.0691i$   \\
-    65 &  $  1.1296e-11 \pm 0.0691i$   \\
-    75 &  $  5.1110e-12 \pm 0.0691i$   \\
-    85 &  $ -4.4132e-12 \pm 0.0691i$   \\
-    95 &  $  2.6624e-12 \pm 0.0691i$   \\
-   105 &  $  2.3847e-12 \pm 0.0691i$   \\
-   115 &  $ -1.1708e-12 \pm 0.0691i$   \\
-   125 &  $  3.0109e-13 \pm 0.0691i$   \\
-   135 &  $ -3.4430e-13 \pm 0.0691i$   \\
-   145 &  $  1.0531e-12 \pm 0.0691i$   \\
-   155 &  $  5.5331e-14 \pm 0.0691i$   \\
-   165 &  $  4.2756e-13 \pm 0.0691i$   \\
-\end{tabular}
-\caption{Nonzero eigenvalues of linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(2) for domain lengths from 25 to 165. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
-\end{table}
-
-Plotting the log of the real part of the nonzero eigenvalue versus domain length, we have a reasonable linear fit, which suggests that the real part of the nonzero eigenvalue decays exponentially as the domain length $L$ increases.
-
-\begin{figure}[H]
-	\includegraphics[width=8.5cm]{expdecayL}
-	\caption{Plot of the log of the real part of the nonzero eigenvalues of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(2) versus domain length $L$. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
-\end{figure}
-
 
 We repeat the above using Chebyshev spectral methods. Since we are using separated boundary conditions on a finite domain, we no longer see the essential spectrum. Instead, we see the absolute spectrum. (I SHOULD LOOK INTO THIS MORE; FOR EXAMPLE, I COULD COMPUTE THE ABSOLUTE SPECTRUM NUMERICALLY AND COMPARE IT TO THE PLOTS.) For the linearization about double pulse 2(2), we have the following spectrum.
 
