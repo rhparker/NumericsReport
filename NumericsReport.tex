@@ -104,12 +104,12 @@ For an equilibrium solution to \eqref{KdV5travel}, we have $u_t = 0$. We can the
 u_{xxxx} - u_{xx} + c u - u^2 = 0
 \end{equation}
 
-Suppose $u^*(x)$ is a solution to \eqref{intKdV}, i.e. it is an equilibrium solution to \eqref{KdV5travel}. Then we can linearize \eqref{intKdV} about the solution $u^*(x)$ to obtain the eigenvalue problem $Hv = \lambda v$, where $H$ is a linear operator on $L^2(\R)$ (I THINK WE ARE OK HERE WITH $L^2$ SINCE WE HAVE DERIVATIVES IN THE WEAK SENSE, BUT THIS COULD ALSO BE $H^4$) given by
+Suppose $u^*(x)$ is a solution to \eqref{intKdV}, i.e. it is an equilibrium solution to \eqref{KdV5travel}. Then we can linearize \eqref{intKdV} about the solution $u^*(x)$ to obtain the eigenvalue problem $Hv = \lambda v$, where $H$ is a linear operator on $L^2(\R)$ given by
 
 \begin{equation}\label{linear4th}
 H = E''(u) = \partial_x^4 - \partial_x^2 + c - 2 u^*
 \end{equation}
-i.e. the operator $H$ is the Hessian of the energy $E$.\\
+i.e. the operator $H$ is the Hessian of the energy $E$. The domain of $H$ is $H^4(\R)$, which is dense in $L^2(\R)$.\\
 
 Similarly, we can linearize the 5th order PDE \eqref{KdV5travel} about the solution $u^*(x)$ to obtain the eigenvalue problem $Lv = \lambda v$, where $L$ is a linear operator on $L^2(\R)$ given by
 
@@ -154,13 +154,15 @@ We start by finding solutions to the 4th order ODE \eqref{intKdV}. We use two di
 \subsection{Parameter Continuation}
 
 We start with the known solution \eqref{exact}, which solves \eqref{intKdV} as well as \eqref{KdV5travel} for $c = 36/169$. We choose one of the two spectral methods above (Fourier or Chebyshev) for spatial discretization. Using this solution on $[-L, L] = [-25, 25]$ as our initial guess, we use Matlab's \texttt{fsolve} to solve \eqref{intKdV} numerically using the appropriate discretization scheme and boundary conditions. Since both the original 5th order PDE \eqref{KdV5travel} and the 4th order stationary ODE \eqref{intKdV} are translation-invariant, these equations do not have unique solutions. In the 4th order case, that means that if $u(x)$ is a solution of \eqref{intKdV}, so is $u(x - a)$ for any $a \in \R$. Since we would like our numerical scheme to have a unique solution, and since the known solution \eqref{exact} is an even function, we modify our scheme to solve the following system of equations:
+
 \begin{align}\label{intKdVsymm}
 u_{xxxx} - u_{xx} + c u - u^2 &= 0 \\
 \int_{-\infty}^\infty \left[ u(x) - u(-x) \right]^2 dx &= 0
 \end{align}
+
 where the second equation enforces even symmetry. This ensures that we have a unique solution. For our discretization, the integral in \eqref{intKdVsymm} is replaced by a sum, i.e. the discrete $L^2$ norm.\\
 
-Starting with the solution for $c = 36/169$ which satisfies \eqref{intKdVsymm} and the appropriate boundary conditions for the spectral method we are using, we use the the method of parameter continuation (reference to NUMERICAL CONTINUATION, AND COMPUTATION OF NORMAL FORMS, Beyn et al, not sure where this is published) for the system \eqref{intKdVsymm}, where the wave speed $c$ is the parameter. Using this method, we increase $c$ by small increments until we reach $c = 10$. Here are plots of the single pulses constructed using this technique, together with a plot showing the linear relationship between the height of the single pulse and the wave speed.
+Starting with the solution for $c = 36/169$ which satisfies \eqref{intKdVsymm} and the appropriate boundary conditions for the spectral method we are using, we use the the method of parameter continuation described in \cite{Beyn2002} for the system \eqref{intKdVsymm}, where the wave speed $c$ is the parameter. Using this method, we increase $c$ by small increments until we reach $c = 10$. Here are plots of the single pulses constructed using this technique, together with a plot showing the linear relationship between the height of the single pulse and the wave speed.
 
 \begin{figure}[H]
 	\includegraphics[width=8.5cm]{continuation.eps}
@@ -182,20 +184,39 @@ To construct double pulses numerically, we paste together two copies of the sing
 \begin{equation}\label{strut}
 u_{xxxx} + Pu_{xx} + u - u^2 = 0
 \end{equation}
-which is used to model equilibrium states of a strut. If we take $P = -1$ in this equation, we obtain our equation \eqref{intKdV} for wave speed $c = 1$. Multipulse solutions occur for $P \in (-2, -2 + \eta)$ for some $\eta > 0$, and should in fact occur for $P \in (-2, 2)$, which includes $P = -1$. Although this equation only corresponds to wave speed $c = 1$, this should generalize to other values of $c$. (I ASSUME THIS IS TRUE, BUT IN ANY CASE, WE ARE ONLY USING THIS FOR NOTATION). We now rewrite Theorem 3.6 for the specific case of double pulses. Since we are not interested in the eigenvalue problem here, we omit that portion of the theorem for simplicity.
+which is used to model equilibrium states of a strut. If we take $P = -1$ in this equation, we obtain our equation \eqref{intKdV} for wave speed $c = 1$. Multipulse solutions occur for $P \in (-2, -2 + \eta)$ for some $\eta > 0$, and should in fact occur for $P \in (-2, 2)$, which includes $P = -1$. For other values of $c$, we can obtain \eqref{intKdV} from \eqref{strut} in the following way. First, multiply \eqref{strut} by $c$ and then replace $x$ by $c^{1/4} x$ to get
+
+\begin{equation*}
+u_{xxxx} + Pc^{1/2}u_{xx} + c u - c u^2 = 0 
+\end{equation*}
+
+Let $P = -1 / c^{1/2}$. For $c > 1/4$ (required for the existence of multipulse solutions to \eqref{KdV5travel}), we have $-2 < P < 0$. Substituting this value of $P$, we obtain
+
+\begin{equation*}
+u_{xxxx} - u_{xx} + c u - c u^2 = 0 
+\end{equation*}
+
+Finally, replace $u$ by $u/c$ to obtain \eqref{intKdV}.\\
+
+We now rewrite Theorem 3.6 for the specific case of double pulses. 
 
 \begin{theorem}
-Let $q(x)$ be a transversely constructed localized solution of \eqref{strut}. Assume that the following hypotheses hold:
+Let $q(x)$ be a transversely constructed localized solution of \eqref{strut}. Assume that the spectrum of the linearization about the solution $u(x) = 0$ contains simple eigenvalues $\pm \alpha \pm i \beta$ for some $\alpha, \beta > 0$. Then the following holds:
 \begin{enumerate}
-	\item The spectrum of the linearization about the solution $u(x) = 0$ contains simple eigenvalues $\pm \alpha \pm i \beta$ for some $\alpha, \beta > 0$.
-	\item I DON'T THINK WE NEED THE CONSERVATIVE ASSUMPTION (3.3), SINCE THIS EQUATION IS HAMILTONIAN; THE  HAMILTONIAN IS GIVEN ON P.2083 OF \cite{Sandstede1997}.
-	\item I DON'T THINK WE NEED THE MELNIKOV ASSUMPTION (3.5) SINCE WE ARE NOT CONCERNED WITH THE EIGENVALUE PROBLEM HERE.
-\end{enumerate}
-Then there exists an $N_0 \in \N$ such that for all $n \geq N_0$, there is a 2-pulse solution $q_n(x)$ of \eqref{strut}. The 2-pulse solution $q_n(x)$ resembles two copies of the single pulse $q(x)$, and the distance between the pulses is given by
+
+\item For all $n \in \N$, there is a 2-pulse solution $q_n(x)$ of \eqref{strut}. The 2-pulse solution $q_n(x)$ resembles two copies of the single pulse $q(x)$, and the distance between the pulses is given by
 \begin{equation}\label{pulsedistance}
 L_n = L + \frac{\pi}{\beta}n + r(n)
 \end{equation}
-where $L$ is a constant, and $r(n) \rightarrow 0$ as $n \rightarrow \infty$. IN THE PAPER \cite{Sandstede1997}, THERE ARE TWO CHAINS OF PULSES SEPARATED BY $2 \pi / \beta$ (TO LEADING ORDER) WHOSE STARTING POINTS ARE SEPARATED BY $\pi / \beta$; ONE CHAIN HAS POSITIVE EIGENVALUES, THE OTHER NEGATIVE. I ELECTED TO COMBINE THEM FOR EASIER NOTATION. WE ALSO MIGHT NOT NEED THE $N_0$ SINCE WE CAN JUST FOLD THAT INTO THE CONSTANT.
+where $L$ is a constant, and $r(n) \rightarrow 0$ as $n \rightarrow \infty$. 
+
+\item For the linearization of \eqref{strut} about the double pulse $q_n(x)$, the eigenvalue problem $H v = \lambda v$, where
+\begin{equation*}
+H = \partial_x^4 + P \partial_x^2 + 1 - 2 q_n  
+\end{equation*}
+has precisely two solutions $\lambda_1, \lambda_2$ inside a ball of radius $\delta$ about the origin for some $\delta > 0$. For all $n$, $\lambda_1 = 0$. For $n$ odd, $\lambda_2 < 0$, and for $n$ even $\lambda_2 > 0$.
+
+\end{enumerate}
 \end{theorem}
 
 We will therefore label our double pulses using the notation $2(n)$, where $n$ is the natural number appearing in the theorem above; $n = 1$ corresponds to the double pulse where the two peaks are the closest. This is consistent with the notation in \cite{Champneys1993}.\\
@@ -248,6 +269,31 @@ The absolute value of the paired eigenvalue near 0 decays exponentially, as we c
 	\caption{Exponential decay of absolute value of eigenvalue near 0 of \eqref{linear4th}, the linearization of the 4th order stationary equation \eqref{intKdV} about double pulses 2(2), 2(3), 2(4), and 2(5). The $x$-axis is predicted distance between the pulses, normalized so that double pulse 2(2) has a distance of 0. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
 \end{figure}
 
+We can also look at the eigenfunctions. For double pulse 2(3), here are the four eigenfunctions corresponding to the eigenvalues in the table above.
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{four10dp2inteigenfn1}
+	\includegraphics[width=8.5cm]{four10dp2inteigenfn2}
+	\caption{Eigenfunctions of \eqref{linear4th}, the linearization of the 4th order stationary equation \eqref{intKdV} about double pulse 2(3). Wave speed $c = 10$. Fourier spectral methods, $N = 256$.}
+\end{figure}
+
+Note that we have a pair of eigenfunctions corresponding to the negative eigenvalues and a pair of eigenfunctions corresponding to the eigenvalues near 0. The eigenfunction corresponding to the eigenvalue nearest 0 (which would be 0, except for numerical error) is the derivative of the double pulse (as expected), which is an odd function. For both pairs, one eigenfunction is odd and the other even. \\
+
+We observe the same pattern for the eigenfunctions corresponding to double pulse 2(2).
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{four10dp1inteigenfn1}
+	\includegraphics[width=8.5cm]{four10dp1inteigenfn2.eps}
+	\caption{Eigenfunctions of \eqref{linear4th}, the linearization of the 4th order stationary equation \eqref{intKdV} about double pulse 2(2). Wave speed $c = 10$. Fourier spectral methods, $N = 256$.}
+\end{figure}
+
+For the single pulse, we have one eigenvalue at 0 (within numerical error) and one negative eigenvalue. The eigenfunction corresponding to the 0 eigenvalue is the derivative of the single pulse, an odd function. The other eigenfunction, corresponding to the negative eigenvalue, is an even function. The two eigenfunctions are shown below.
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{four10singleinteigenfn}
+	\caption{Eigenfunctions of \eqref{linear4th}, the linearization of the 4th order stationary equation \eqref{intKdV} about the single pulse. Wave speed $c = 10$. Fourier spectral methods, $N = 256$.}
+\end{figure}
+
 Next, we look at the eigenvalue problem $Lv = \lambda v$ posed on $L^2$ for the linearization \eqref{linear5th} of the 5th order PDE \eqref{KdV5travel}. For speed $c = 10$, we linearize about the first four double pulses.\\
 
 First we do this using Fourier spectral methods (periodic boundary conditions). Here are plots of the spectra of the linearization about pulses 2(2) and 2(3).
@@ -283,7 +329,7 @@ In the next figure, we see the spectrum of the linearization of the 5th order eq
 \begin{figure}[H]
 	\includegraphics[width=8.5cm]{four10ud2_3expwt}
 	\includegraphics[width=8.5cm]{four10ud2_3expwt2}
-	\caption{Spectrum of the linearization \eqref{linear5th} of the 5th order equation \eqref{KdV5travel} about double pulse 2(3) in exponentially weighted space with weight $a = 0.1$. Comparison with predicted essential spectrum is on left. Zoom around origin on right. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
+	\caption{Spectrum of the operator $L_a$ with periodic boundary conditions for exponential weight $a = 0.1$. Comparison with predicted essential spectrum is on left. Zoom around origin on right. Wave speed $c = 10$, Fourier spectral methods, $N = 256$.}
 \end{figure}
 
 Now that we have found the eigenvalues for double pulse 2(3) in the weighted space, we can locate them in the unweighted space since the point spectrum does not change when we apply an exponential weight. The figure below illustrates this.
@@ -327,11 +373,34 @@ Using this data, we can find a relationship between the absolute value of the ei
 	\label{eigvsspeed}
 \end{figure}
 
-For double pulse 2(3), it is useful to look at the essential spectrum as the domain length $L$ increases (recall that the domain is $[-L, L]$). We require more Fourier nodes ($N = 768$) to do this to ensure that enough grid points capture the wave in the center. The next plot shows the imaginary part of the spectrum for domain lengths from 25 to 165. The two nonzero eigenvalues on (or near) the imaginary axis are shown in red; these remain stationary as the domain length increases. As $L$ increases, the other points on the essential spectrum move down the imaginary axis towards the origin. However, for the values of $L$ we looked at here, these essential spectrum points do not ``cross over'' the eigenvalues. 
+We can also look at the relationship between the $\alpha$, the exponential decay rate of the tails of our pulses, and the wave speed $c$. Using a best-fit straight line for sufficiently large $c$, we see that $\alpha$ is approximately of order $c^{1/4}$, which is what we expect given the form of the characteristic polynomial \eqref{charpoly1}
+
+\begin{figure}[H]
+	\includegraphics[width=8.5cm]{alphavsc.eps}
+	\includegraphics[width=8.5cm]{alphavsczoom}
+	\caption{Plot of $\log{\alpha}$ vs $\log{c}$, where $\alpha$ is the positive real part of the roots of the characteristic polynomial \eqref{charpoly1}. On left, we have speeds $c$ from 1 to 100. On right, we show speeds $c$ from 30 to 100, together with a best-fit straight line. The slope of the line is approximately $1/4$.}
+	\label{alphavsc}
+\end{figure}
+
+For double pulse 2(3), it is useful to look at the essential spectrum as the domain length $L$ increases (recall that the domain is $[-L, L]$). We require more Fourier nodes ($N = 768$) to do this to ensure that enough grid points capture the wave in the center. We can predict the values of the essential spectrum closest to the origin in the following way. Since we are on a finite domain $[-L, L]$, the eigenvalue problem
+\begin{equation}\label{5theigenvalueproblem}
+u_{xxxxx} - u_{xxx} + cu_x = \lambda u
+\end{equation}
+is posed on $[-L, L]/~$, i.e. the circle of length $2L$. The endpoints $-L$ and $L$ are identified with each other, so any solution must take equal values at those endpoints. Solutions must thus be of the form $u(x) = \exp(i \pi n x/L)$. Substituting this into \ref{5theigenvalueproblem}, we obtain the dispersion relation
+\begin{align}\label{5thdispersion}
+\lambda_n = i \frac{\pi n}{L} \left[ \left(\frac{\pi n}{L}\right)^4  + \left(\frac{\pi n}{L}\right)^2 + c \right] && n \in \Z
+\end{align}
+Thus we have $\lambda_0 = 0$ and
+\begin{equation*}
+\lambda_1 = i \frac{\pi c}{L} \left[ 1 + \mathcal{O} \left(\frac{1}{L^2} \right)\right]
+\end{equation*}
+For $L$ sufficiently large, the point on the essential spectrum nearest the origin is approximately $i \pi c / L$. For Fourier spectral methods with $N$ Fourier nodes, we restrict $n$ to $-N/2 < n \leq N/2$, but this does not affect the low modes in any way.\\
+
+The next plot shows the imaginary part of the spectrum for domain lengths from 25 to 165. The two nonzero eigenvalues on (or near) the imaginary axis are shown in red; these remain stationary as the domain length increases. As $L$ increases, the other points on the essential spectrum move down the imaginary axis towards the origin. However, for the values of $L$ we looked at here, these essential spectrum points do not ``cross over'' the eigenvalues. \\
 
 \begin{figure}[H]\label{essspecL}
 	\includegraphics[width=8.5cm]{essspecL}
-	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) plotted for domain lengths $L$ from 25 to 165. Imaginary part of nonzero eigenvalues are shown in red. Essential spectrum is shown in blue. The predicted value of the points on the essential spectrum closest to the origin (given by $\pm \pi c/L$) is shown in green. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
+	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) plotted for domain lengths $L$ from 25 to 165. Imaginary part of nonzero eigenvalues are shown in red. Essential spectrum is shown in blue. The predicted value of the points on the essential spectrum closest to the origin (given by $\pm i \pi c/L$) is shown in green. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
 	\label{essspecL}
 \end{figure}
 
@@ -367,11 +436,11 @@ Plotting the log of the real part of the nonzero eigenvalue versus domain length
 	\caption{Plot of the log of the real part of the nonzero eigenvalues of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(2) versus domain length $L$. Wave speed $c = 10$, Fourier spectral methods, $N = 768$.}
 \end{figure}
 
-We would like to find appropriate values of $c$ and $L$ such that we can observe the essential spectrum ``crossing over'' the eigenvalues. To do this, we note that the point on the essential spectrum closest to the origin is approximately $\pi c / L$. We can also use the relationship between eigenvalue and wave speed suggested by Figure \ref{eigvsspeed} to predict the eigenvalues for a given $c$. Using both of these, we reason that for $c = 150$, we should see a ``crossing over'' at about $L = 120$. To do this, we use $N = 1024$ grid points to accommodate such a large domain. A plot similar to Figure \ref{essspecL} shows this ``crossing over''.
+We would like to find appropriate values of $c$ and $L$ such that we can observe the essential spectrum ``crossing over'' the eigenvalues. As above, we note that the point on the essential spectrum closest to the origin is approximately $i \pi c / L$. We can also use the relationship between eigenvalue and wave speed suggested by Figure \ref{eigvsspeed} to predict the eigenvalues for a given $c$. Using both of these, we reason that for $c = 150$, we should see a ``crossing over'' at about $L = 120$. To do this, we use $N = 1024$ grid points to accommodate such a large domain. A plot similar to Figure \ref{essspecL} shows this ``crossing over''.
 
 \begin{figure}[H]
 	\includegraphics[width=8.5cm]{crossingover}
-	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3), wave speed $c = 150$, plotted for domain lengths $L$ from 100 to 140. Imaginary part of nonzero eigenvalues are shown in red. Essential spectrum is shown in blue. The predicted value of the points on the essential spectrum closest to the origin (given by $\pm \pi c/L$) is shown in green. Fourier spectral methods, $N = 1024$.}
+	\caption{Imaginary part of the spectrum of the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3), wave speed $c = 150$, plotted for domain lengths $L$ from 105 to 125. Imaginary part of nonzero eigenvalues are shown in red. Essential spectrum is shown in blue. The predicted value of the points on the essential spectrum closest to the origin (given by $\pm \pi c/L$) is shown in green. Fourier spectral methods, $N = 1024$.}
 \end{figure}
 
 The imaginary part of the eigenvalues (in red above) does change slightly as the domain length $L$ is increased, probably since we do not have many grid points compared to the size of the domain we are using. The real part, however, stays near 0, as we can see in the following table. In particular, the eigenvalues do not appear to move off the imaginary axis after the ``crossing over'' occurs.
@@ -379,15 +448,36 @@ The imaginary part of the eigenvalues (in red above) does change slightly as the
 \begin{table}[H]
 \begin{tabular}{l|l}
 Domain Length (L)  & Nonzero eigenvalues \\ \hline
-    100 &  $  -2.7747e-11 \pm 3.9858i$   \\
+    105 &  $  2.5200e-11 \pm 3.9858i$   \\
     110 &  $  1.3851e-12  \pm 3.9858i$   \\
-    120 &  $  -2.1678e-11 \pm 3.9835i$   \\
-    130 &  $ -7.1343e-12 \pm 3.9841i$   \\
-    140 &  $  -3.3320e-12 \pm 3.9932i$   \\
+    115 &  $  -4.6451e-12 \pm 3.9835i$   \\
+    120 &  $ -2.1678e-11 \pm 3.9841i$   \\
+    125 &  $ 3.5448e-12 \pm 3.9932i$   \\
 \end{tabular}
 
-\caption{Nonzero eigenvalues of linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) for domain lengths from 100 to 140. Wave speed $c = 150$, Fourier spectral methods, $N = 1024$.}
+\caption{Nonzero eigenvalues of linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about double pulse 2(3) for domain lengths from 105 to 125. Wave speed $c = 150$, Fourier spectral methods, $N = 1024$.}
 \end{table}
+
+We can also calculate the Krein signatures for the crossing pair (the interaction eigenvalue and the essential spectrum eigenvalue). We calculate the Krein signatures as follows. Suppose for the eigenvalue problem $Lv = \lambda v$, where $L$ is the the linearization \eqref{linear5th} of 5th order PDE \eqref{KdV5travel} about a stationary solution $u^*$, we have a pair of nonzero eigenvalues $\pm i \omega$ with corresponding eigenfunctions $u \pm i w$, where both $u$ and $w$ are real-valued functions. (We are assuming this is the case for Double Pulse 2(3); see below for numerical evidence to support this claim.) Let $E_{\pm i \omega} = \textrm{span}(u, w)$ be a two-dimensional subspace that contains both eigenfunctions $u \pm i w$. Then for any $\xi \in E_{\pm i \omega}$, we define the Krein signature of $E_{\pm i \omega}$ as 
+
+\begin{equation}\label{kreinsig}
+\sigma_\omega = \textrm{sgn} \frac{1}{2} \xi^T H \xi
+\end{equation}
+where $H = E''(u)$ is the linearization \eqref{linear4th} of 4th order equation \eqref{intKdV}, as well as the Hessian of the energy \eqref{Hamiltonian}. The Krein signature is independent of the choice of $\xi$, as is shown on p. 366 of \cite{Meiss2017} (we also verified this numerically using different linear combinations of $u$ and $w$). For the two crossing eigenvalues above, we have the following Krein signatures:
+
+\begin{table}[H]
+\begin{tabular}{l|ll}
+Domain Length (L)  & Interaction Eigenvalue & Essential Spectrum Eigenvalue \\ \hline
+    105 & -1 &  1 \\
+    110 & -1 &  1 \\
+    115 & -1 &  1 \\
+    120 & -1 &  1 \\
+    125 & -1 &  1 \\
+\end{tabular}
+\end{table}
+
+Thus for the entire crossing, the two eigenvalues have opposite Krein signature. Since the Krein signatures are opposite, a Krein quartet can be created after the two eigenvalues collide. This is not what we observe. In our numerics, the two eigenvalues simply pass through each other. There must be something keeping the eigenvalues on the imaginary axis, but as of yet we do not know what that is!\\
+
 
 For double pulses 2(3) and 2(5), there is a pair of complex conjugate eigenvalues which are very near to the imaginary axis. We would like to know if the real part is numerical error, i.e. if the real part is actually 0. Several pieces of numerical evidence suggest that this is actually the case. 
 
